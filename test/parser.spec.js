@@ -12,7 +12,8 @@ import {
   CallMember,
   CallFunction,
   AccessThis,
-  AccessAncestor
+  AccessAncestor,
+  ValuePipe
 } from '../src/ast';
 
 describe('Parser', () => {
@@ -226,17 +227,49 @@ describe('Parser', () => {
   });
   
   it('does not parse invalid shorthand properties', () => {
-      let pass = false;
-      try {
-          parser.parse('{ foo.bar, bar.baz }');
-          pass = true;
-      } catch (e) { pass = false; }
-      expect(pass).toBe(false);
-      
-      try {
-          parser.parse('{ "foo.bar" }');
-          pass = true;
-      } catch (e) { pass = false; }
-      expect(pass).toBe(false);
+      expect(() => parser.parse('{foo.bar, bar.baz}')).toThrow();
+      expect(() => parser.parse('{ "foo.bar" }')).toThrow();
+  });
+  
+  it('parses value pipes', () => {
+     let expression = parser.parse('foo >> bar');
+     
+     expect(expression instanceof ValuePipe).toBe(true);
+     expect(expression.target instanceof AccessScope).toBe(true);
+     expect(expression.target.name).toBe('bar');
+     
+     expect(expression.expression instanceof AccessScope).toBe(true);
+     expect(expression.expression.name).toBe('foo');
+  });
+  
+  it('parses value converters and value pipes', () => {
+    let expression = parser.parse('foo | bar:x >> baz');
+    
+    expect(expression instanceof ValuePipe).toBe(true);
+    
+    expect(expression.target instanceof AccessScope).toBe(true);
+    expect(expression.target.name).toBe('baz');
+    
+    expect(expression.expression instanceof ValueConverter).toBe(true);
+    expect(expression.expression.name).toBe('bar');
+    expect(expression.expression.args).toEqual([new AccessScope('x',0)]);
+    expect(expression.expression.expression instanceof AccessScope).toBe(true);  
+  });
+  
+  it('parses value converters, value pipes and binding behaviors', () => {
+    let expression = parser.parse('foo | bar:x >> baz & qux:a');
+    
+    expect(expression instanceof BindingBehavior).toBe(true);
+    expect(expression.name).toBe('qux');
+    expect(expression.args).toEqual([new AccessScope('a', 0)])
+    
+    expect(expression.expression instanceof ValuePipe).toBe(true);
+    expect(expression.expression.target instanceof AccessScope).toBe(true);
+    expect(expression.expression.target.name).toBe('baz');
+    
+    expect(expression.expression.expression instanceof ValueConverter).toBe(true);
+    expect(expression.expression.expression.name).toBe('bar');
+    expect(expression.expression.expression.args).toEqual([new AccessScope('x',0)]);
+    expect(expression.expression.expression.expression instanceof AccessScope).toBe(true);  
   });
 });

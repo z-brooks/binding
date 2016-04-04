@@ -20,7 +20,10 @@ describe('ExpressionCloner', () => {
       'foo.bar.baz',
       `{'a':b,'c':d,'e':f}`,
       '[a,b,c]',
-      'foo'
+      'foo',
+      'foo>>bar',
+      'foo|bar:a>>baz',
+      'foo|bar:a>>baz&qux:b',
     ];
     let i = expressions.length;
     while (i--) {

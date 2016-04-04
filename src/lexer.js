@@ -98,6 +98,7 @@ export class Scanner {
       return this.scanOperator(start, String.fromCharCode(this.peek));
     case $LT:
     case $GT:
+      return this.scanComplexOperator(start, $GT, '>', '>');
     case $BANG:
     case $EQ:
       return this.scanComplexOperator(start, $EQ, String.fromCharCode(this.peek), '=');
@@ -316,7 +317,8 @@ const OPERATORS = [
   '&',
   '|',
   '!',
-  '?'
+  '?',
+  '>>'
 ];
 
 const $EOF = 0;

@@ -4,7 +4,8 @@ import {
   AccessThis, AccessScope, AccessMember, AccessKeyed,
   CallScope, CallFunction, CallMember,
   PrefixNot, BindingBehavior, Binary,
-  LiteralPrimitive, LiteralArray, LiteralObject, LiteralString
+  LiteralPrimitive, LiteralArray, LiteralObject, LiteralString,
+  ValuePipe
 } from './ast';
 
 let EOF = new Token(-1, null);
@@ -63,7 +64,7 @@ export class ParserImplementation {
   }
 
   parseBindingBehavior() {
-    let result = this.parseValueConverter();
+    let result = this.parseValuePipe();
 
     while (this.optional('&')) {
       let name = this.peek.text;
@@ -78,6 +79,17 @@ export class ParserImplementation {
       result = new BindingBehavior(result, name, args);
     }
 
+    return result;
+  }
+
+  parseValuePipe() {
+    let result = this.parseValueConverter();
+      
+    if( this.optional('>>') ) {
+      let target = this.parseAccessOrCallMember();
+      result = new ValuePipe(target, result); 
+    }
+      
     return result;
   }
 

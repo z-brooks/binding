@@ -3,7 +3,8 @@ import {
   AccessThis, AccessScope, AccessMember, AccessKeyed,
   CallScope, CallFunction, CallMember,
   PrefixNot, BindingBehavior, Binary,
-  LiteralPrimitive, LiteralArray, LiteralObject, LiteralString
+  LiteralPrimitive, LiteralArray, LiteralObject, LiteralString,
+  ValuePipe
 } from './ast';
 
 export class ExpressionCloner {
@@ -32,6 +33,13 @@ export class ExpressionCloner {
       converter.expression.accept(this),
       converter.name,
       this.cloneExpressionArray(converter.args));
+  }
+
+  visitValuePipe(pipe) {
+      return new ValuePipe(
+          pipe.target.accept(this),
+          pipe.expression.accept(this)
+      );
   }
 
   visitAssign(assign) {

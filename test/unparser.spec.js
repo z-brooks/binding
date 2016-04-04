@@ -19,7 +19,10 @@ describe('Unparser', () => {
       'foo.bar.baz',
       `{'a':b,'c':d,'e':f}`,
       '[a,b,c]',
-      'foo'
+      'foo',
+      'foo>>bar',
+      'foo|bar:a>>baz',
+      'foo|bar>>baz&qux:b',
     ];
     let i = expressions.length;
     while (i--) {

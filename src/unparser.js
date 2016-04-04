@@ -54,6 +54,12 @@ export class Unparser {
     }
   }
 
+  visitValuePipe(pipe) {
+    pipe.expression.accept(this);
+    this.write('>>');
+    pipe.target.accept(this);
+  }
+
   visitValueConverter(converter) {
     let args = converter.args;
 

@@ -100,6 +100,27 @@ export class BindingBehavior extends Expression {
   }
 }
 
+export class ValuePipe extends Expression {
+  constructor(target, expression) {
+    super();
+
+    this.target = target;
+    this.expression = expression;
+  }
+
+  evaluate(scope, lookupFunctions) {
+    return this.target.assign(scope, this.expression.evaluate(scope, lookupFunctions));
+  }
+
+  accept(vistor) {
+    return vistor.visitValuePipe(this);
+  }
+
+  connect(binding, scope) {
+      this.expression.connect(binding, scope);
+  }
+}
+
 export class ValueConverter extends Expression {
   constructor(expression, name, args, allArgs) {
     super();
